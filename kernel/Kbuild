@@ -4,24 +4,12 @@ kernelsu-objs += feature/kernel_umount.o
 kernelsu-objs += feature/sulog.o
 kernelsu-objs += feature/sucompat.o
 
-kernelsu-objs += hook/lsm_hook.o
 kernelsu-objs += hook/setuid_hook.o
-kernelsu-objs += hook/syscall_event_bridge.o
-kernelsu-objs += hook/syscall_hook_manager.o
-kernelsu-objs += hook/tp_marker.o
-ifeq ($(CONFIG_ARM64),y)
-kernelsu-objs += hook/arm64/patch_memory.o
-kernelsu-objs += hook/arm64/syscall_hook.o
-else ifeq ($(CONFIG_X86_64),y)
-kernelsu-objs += hook/x86_64/patch_memory.o
-kernelsu-objs += hook/x86_64/syscall_hook.o
-endif
 
 kernelsu-objs += infra/file_wrapper.o
 kernelsu-objs += infra/event_queue.o
 kernelsu-objs += infra/seccomp_cache.o
 kernelsu-objs += infra/su_mount_ns.o
-kernelsu-objs += infra/symbol_resolver.o
 
 ifneq ($(CONFIG_KSU_DISABLE_MANAGER),y)
 kernelsu-objs += manager/apk_sign.o
@@ -60,9 +48,6 @@ ccflags-y += -DCONFIG_KSU_DISABLE_POLICY=1
 endif
 ifeq ($(CONFIG_KSU_DEBUG),y)
 ccflags-y += -DCONFIG_KSU_DEBUG=1
-endif
-ifeq ($(CONFIG_KSU_X86_PATCH_SYSCALL_DISPATCHER),y)
-ccflags-y += -DCONFIG_KSU_X86_PATCH_SYSCALL_DISPATCHER=1
 endif
 endif
 
@@ -154,3 +139,16 @@ ccflags-y += -Wno-strict-prototypes -Wno-int-conversion -Wno-gcc-compat -Wno-mis
 ccflags-y += -Wno-declaration-after-statement -Wno-unused-function
 
 # Keep a new line here!! Because someone may append config
+
+# --- Force SuSFS Macros and Compiler Overrides ---
+ccflags-y += -Wno-pointer-bool-conversion
+ccflags-y += -DCONFIG_KSU_SUSFS=1
+ccflags-y += -DCONFIG_KSU_SUSFS_SUS_PATH=1
+ccflags-y += -DCONFIG_KSU_SUSFS_SUS_MOUNT=1
+ccflags-y += -DCONFIG_KSU_SUSFS_SUS_KSTAT=1
+ccflags-y += -DCONFIG_KSU_SUSFS_SPOOF_UNAME=1
+ccflags-y += -DCONFIG_KSU_SUSFS_ENABLE_LOG=1
+ccflags-y += -DCONFIG_KSU_SUSFS_HIDE_KSU_SUSFS_SYMBOLS=1
+ccflags-y += -DCONFIG_KSU_SUSFS_SPOOF_CMDLINE_OR_BOOTCONFIG=1
+ccflags-y += -DCONFIG_KSU_SUSFS_OPEN_REDIRECT=1
+ccflags-y += -DCONFIG_KSU_SUSFS_SUS_MAP=1
